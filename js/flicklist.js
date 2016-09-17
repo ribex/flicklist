@@ -1,22 +1,16 @@
-
-
 $(document).ready(function() {
   discoverMovies(render);
 });
 
-
-
 var model = {
   watchlistItems: [],
   browseItems: []
-}
-
+};
 
 var api = {
   root: "https://api.themoviedb.org/3",
-  token: "8e888fa39ec243e662e1fb738c42ae99" // TODO 0 add your api key
-}
-
+  token: "d40110d0f9e5d62b8e314e7733570b3a" // TODO 0 add your api key
+};
 
 /**
  * Makes an AJAX request to /discover/movie endpoint of the API
@@ -37,7 +31,6 @@ function discoverMovies(callback) {
   });
 }
 
-
 /**
  * Makes an AJAX request to the /search/movie endpoint of the API, using the 
  * query string that was passed in
@@ -51,10 +44,22 @@ function searchMovies(searchTerm, callback) {
   // TODO 9
   // implement this function as described in the comment above
   // you can use the body of discoverMovies as a jumping off point
+  $.ajax({
+    url: api.root + "/search/movie",
+    data: {
+      api_key: api.token,
+      query: searchTerm,
+
+    },
+      success: function(response) {
+      model.browseItems = response.results;
+      console.log(response.results);
+      render();
+    }
+  });
 
 
 }
-
 
 /**
  * re-renders the page with new content, based on the current state of the model
@@ -72,7 +77,7 @@ function render() {
       .append(title)
       // TODO 3
       // give itemView a class attribute of "item-watchlist"
-
+      .attr("class", "item-watchlist");
     $("#section-watchlist ul").append(itemView);
   });
 
@@ -84,18 +89,23 @@ function render() {
       .click(function() {
         model.watchlistItems.push(movie);
         render();
-      });
+      })
+
       // TODO 2
       // the button should be disabled if this movie is already in
       // the user's watchlist
       // see jQuery .prop() and Array.indexOf()
+      .prop("disabled", model.watchlistItems.indexOf(movie) !== -1);
 
 
     // TODO 1
     // create a paragraph containing the movie object's .overview value
     // then, in the code block below,
     // append the paragraph in between the title and the button
-
+    // console.log(movie);
+    var overview = $("<p></p>").text(movie.overview);
+    title.append(overview);
+   
 
     // append everything to itemView, along with an <hr/>
     var itemView = $("<li></li>")
@@ -106,9 +116,4 @@ function render() {
     // append the itemView to the list
     $("#section-browse ul").append(itemView);
   });
-  
 }
-
-
-
-
