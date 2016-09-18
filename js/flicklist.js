@@ -1,14 +1,11 @@
-
-
 var model = {
   watchlistItems: [],
   browseItems: []
-}
-
+};
 
 var api = {
   root: "https://api.themoviedb.org/3",
-  token: "TODO", // TODO 0 add your api key
+  token: "d40110d0f9e5d62b8e314e7733570b3a", // TODO 0 add your api key
   /**
    * Given a movie object, returns the url to its poster image
    */
@@ -16,7 +13,7 @@ var api = {
     var baseImageUrl = "http://image.tmdb.org/t/p/w300/";
     return baseImageUrl + movie.poster_path; 
   }
-}
+};
 
 
 /**
@@ -28,16 +25,18 @@ var api = {
 
 // TODO 1
 // this function should accept a second argument, `keywords`
-function discoverMovies(callback) {
+function discoverMovies(callback, keywords) {
 
   // TODO 2 
   // ask the API for movies related to the keywords that were passed in above
   // HINT: add another key/value pair to the `data` argument below
+  // console.log(keywords);
 
   $.ajax({
     url: api.root + "/discover/movie",
     data: {
       api_key: api.token,
+      with_keywords: keywords,
     },
     success: function(response) {
       model.browseItems = response.results;
@@ -58,6 +57,26 @@ function searchMovies(query, callback) {
   // TODO 3
   // change the url so that we search for keywords, not movies
 
+  $.ajax({
+    url: api.root + "/search/keyword",
+    data: {
+      api_key: api.token,
+      query: query
+    },
+    success: function(response) {
+      console.log("discover response:");
+      console.log(response);
+
+      var keywordIDs = response.results.map(findId);
+      console.log(keywordIDs);
+      
+      var keywordsString = keywordIDs.join('|');
+      console.log("keywordsString: " + keywordsString);
+      
+      discoverMovies(callback, keywordsString);
+
+    }
+  });
 
   // TODO 4
   // when the response comes back, do all the tasks below:
@@ -75,7 +94,6 @@ function searchMovies(query, callback) {
   //      "192305,210090,210092,210093"
   // HINT: use the Array join function
 
-
   // TODO 4c
   // instead of a comma-separated string, we want the ids
   // to be spearated with the pipe "|" character, eg:
@@ -89,17 +107,9 @@ function searchMovies(query, callback) {
   // 1) the callback 
   // 2) the string of keywords
 
-
-  $.ajax({
-    url: api.root + "/search/movie",
-    data: {
-      api_key: api.token,
-      query: query
-    },
-    success: function(response) {
-      console.log(response);
-    }
-  });
+}
+function findId(arg) {
+  return arg.id;
 }
 
 
